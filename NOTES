@@ -1,0 +1,1 @@
+python -m imapfs -o host=<HOST> -o user=<USER> -o password=<PASSWORD> -o mailbox=Test/1/2/3 -f /tmp/test
