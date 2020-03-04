@@ -47,7 +47,14 @@ class IMAPConnection:
     """
     results = self.conn.select(mailbox)
     if results[0] != "OK":
-      raise Exception()
+      target = ""
+      for level in mailbox.split('/'):
+        target += "{}/".format(level)
+        self.conn.create(target)
+
+      results = self.conn.select(mailbox)
+      if results[0] != "OK":
+        raise Exception()
     self.mailbox = mailbox
 
 
@@ -98,14 +105,14 @@ class IMAPConnection:
   def delete_message(self, uid):
     """Delete a message by UID
     """
-    self.conn.uid("STORE", uid, "+FLAGS", "\\Deleted")
+    self.conn.uid("STORE", uid, "+FLAGS", "(\\Deleted)")
 
     # Invalidate cache
     for subject, s_uid in self.uid_cache.items():
         if s_uid == uid:
           self.uid_cache.pop(subject)
 
-    # self.conn.expunge()
+    self.conn.expunge()
 
   def search_by_subject(self, subject):
     """Returns a list of UIDs of messages with given subject
